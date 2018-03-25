@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <head></head>
+    <main>
+        <div class="wrapper" id="main">
+
+        </div>
+    </main>
+    <footer></footer>
+    <script>
+        var hash = init()
+        var keys = hash.keys
+        var websites = hash.websites
+
+        generateKeyboard(keys, websites)
+
+
+        function init() {
+            var keys = {
+                '0': ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                '1': ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                '2': ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+                'length': 3
+            }
+            var websites = { 'q': 'qq.com', 'w': 'weibo.com', 'e': 'ele.me', 'r': 'renren.com', 't': 'tianya.com', 'y': 'youtube.com', 'u': 'uc.com', 'i': 'iqiyi.com', 'o': 'opera.com', 'p': undefined, 'a': 'acfun.tv', 's': 'sohu.com', 'z': 'zhihu.com', 'm': 'www.mcdonalds.com.cn' }
+            var storageData = getFromLocalStorage('website')
+
+            if (storageData) {
+                websites = storageData
+            }
+
+            return {
+                keys: keys,
+                websites: websites
+            }
+        }
+
+        function generateKeyboard(keys, websites) {
+            //布局
+            for (var index = 0; index < keys.length; index++) {
+                var div = tag('div', { className: 'row' })
+
+                for (var index2 = 0; index2 < keys[index].length; index2++) {
+                    element = keys[index][index2];
+                    var kbd = tag('kbd', { className: 'key' })
+                    var span = createSpan(element)
+
+                    var img = createImage(websites[element])
+
+                    var button = createButton(element)
+                    var deleteButton = createDeleteButton(element)
+
+                    kbd.appendChild(span)
+                    kbd.appendChild(img)
+                    kbd.appendChild(button)
+                    kbd.appendChild(deleteButton)
+                    div.appendChild(kbd)
+                }
+                main.appendChild(div)
+            }
+        }
+
+        function listenToUser(websites) {
+            //监听
+            document.onkeypress = function (event) {
+
+                var key = event.key
+                var website = websites[key]
+                if (website && website.indexOf('http') < 0) {
+                    website = 'http://' + website
+                }
+                window.open(website, '_blank')
+            }
+        }
+
+
+        function getFromLocalStorage(name) {
+            return JSON.parse(localStorage.getItem('website') || 'null')
+        }
+
+        function tag(name, attribute) {
+            var element = document.createElement(name)
+            if (attribute) {
+                for (var key in attribute) {
+                    element[key] = attribute[key]
+                }
+            }
+            return element
+        }
+
+        function createSpan(content) {
+            var span = tag('span')
+            span.textContent = content
+            span.className = "text"
+            return span
+        }
+
+        function createButton(id) {
+            var button = tag('button')
+            button.textContent = '编辑'
+            button.id = id
+            button.className = 'editBtn'
+            button.onclick = function (event) {
+                console.log(event)
+                var button2 = event.target
+                var img2 = button2.previousSibling
+                var btnId = button2.id
+                var ppContent = prompt('输入一个网站')
+                websites[btnId] = ppContent
+
+                let url = websites[btnId]
+                if (url && url.indexOf('http') < 0) {
+                    url = 'http://' + url
+                    img2.src = url + '/favicon.ico'
+                } else if (url == undefined) {
+                    img2.src = './img/dot.png'
+                }
+
+                localStorage.setItem('website', JSON.stringify(websites))
+            }
+            return button
+        }
+
+        function createDeleteButton(id) {
+            var button = tag('button')
+            button.textContent = '删除'
+            button.id = 'd-' + id
+            button.className = 'deleteBtn'
+            button.onclick = function (event) {
+                console.log(event)
+                var button2 = event.target
+                var btnId = button2.id.substring(2,button2.id.length)
+                var ppContent = confirm('确认要删除吗')
+                if(ppContent){
+                    websites[btnId] = undefined
+                    var img2 = button2.previousSibling.previousSibling
+                    console.log(img2)
+                    img2.src = './img/dot.png'
+                }
+                console.log(websites)
+
+                localStorage.setItem('website', JSON.stringify(websites))
+                // window.location.reload()
+            }
+            return button
+        }
+
+
+        function createImage(domain) {
+            var img = tag('img')
+            let url = domain
+            if (url && url.indexOf('http') < 0) {
+                url = 'http://' + url
+                img.src = url + '/favicon.ico'
+            } else if (url == undefined) {
+                img.src = './img/dot.png'
+            }
+            img.onerror = function (event) {
+                event.target.src = './img/dot.png'
+            }
+            return img
+        }
+    </script>
+</body>
+
+</html>
