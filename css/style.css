@@ -24,6 +24,9 @@ kbd  .editBtn {
     right: 0;
     bottom: 0;
     display: none;
+    background-color: orange;
+    color: white;
+    border-radius: 4px;
 }
 
 kbd:hover > button{
@@ -83,4 +86,7 @@ main {
     right: 0;
     top: 0;
     display: none;
+    background-color: orange;
+    color: white;
+    border-radius: 4px;
 }
